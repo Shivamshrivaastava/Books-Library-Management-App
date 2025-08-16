@@ -1,9 +1,10 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const Book = require('./models/Books');
-const connectDB = require('./config/db');
+const mongoose = require("mongoose")
+const dotenv = require("dotenv")
+const Book = require("../models/Book")
 
-const booksData = [
+dotenv.config()
+
+const sampleBooks = [
   {
     title: 'Pride and Prejudice',
     author: 'Jane Austen',
@@ -236,13 +237,24 @@ const booksData = [
   }
 ];
 
-booksData.forEach(book => {
-  book.availability = true;
-});
+const seedBooks = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI)
+    console.log("Connected to MongoDB")
 
-connectDB().then(async () => {
-  await Book.deleteMany({});
-  await Book.insertMany(booksData);
-  console.log(`Seeded ${booksData.length} public-domain books with real covers.`);
-  mongoose.disconnect();
-});
+    // Clear existing books
+    await Book.deleteMany({})
+    console.log("Cleared existing books")
+
+    // Insert sample books
+    await Book.insertMany(sampleBooks)
+    console.log("Sample books inserted successfully")
+
+    process.exit(0)
+  } catch (error) {
+    console.error("Error seeding books:", error)
+    process.exit(1)
+  }
+}
+
+seedBooks()

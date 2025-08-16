@@ -1,0 +1,44 @@
+const mongoose = require("mongoose")
+
+const myBookSchema = new mongoose.Schema(
+  {
+    userId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
+    bookId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Book",
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ["Want to Read", "Currently Reading", "Read"],
+      default: "Want to Read",
+    },
+    rating: {
+      type: Number,
+      min: 1,
+      max: 5,
+    },
+    review: {
+      type: String,
+      trim: true,
+    },
+    dateStarted: {
+      type: Date,
+    },
+    dateFinished: {
+      type: Date,
+    },
+  },
+  {
+    timestamps: true,
+  },
+)
+
+// Ensure a user can only have one entry per book
+myBookSchema.index({ userId: 1, bookId: 1 }, { unique: true })
+
+module.exports = mongoose.model("MyBook", myBookSchema)
